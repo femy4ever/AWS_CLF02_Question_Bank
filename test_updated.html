@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AWS Exam CLF02</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5dc;
+            color: #704214;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #homePage {
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #homePage label {
+            font-size: 1.2em;
+        }
+
+        #homePage input {
+            padding: 8px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 150px;
+        }
+
+        #settings {
+            padding: 10px;
+            background-color: #e8e0d1;
+            margin-bottom: 10px;
+            display: none;
+            justify-content: space-around;
+            align-items: center;
+            width: 100%;
+        }
+
+        #questionContainer {
+            padding: 20px;
+            position: relative;
+            display: none;
+            width: 80%;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .answer {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .answers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #results {
+            margin-top: 20px;
+            font-weight: bold;
+            padding: 20px;
+            background-color: #e0d8c9;
+            width: 80%;
+            display: none;
+        }
+
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            background-color: #3f51b5;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #303f9f;
+        }
+
+        #submitBtn {
+            background-color: #4CAF50;
+            display: none;
+        }
+
+        #submitBtn:hover {
+            background-color: #45a049;
+        }
+
+        /* New styles for results page */
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .correct {
+            border: 2px solid #4CAF50;
+            background-color: #e8f5e9;
+        }
+
+        .incorrect {
+            border: 2px solid #F44336;
+            background-color: #ffebee;
+        }
+
+        .correct-answer-text {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .user-answer-text {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .options-list {
+            margin-top: 10px;
+        }
+
+        .explanation {
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        /* Themed styles */
+        body.dark-theme {
+            background-color: #333;
+            color: #eee;
+        }
+
+        body.dark-theme #settings {
+            background-color: #555;
+            color: #eee;
+        }
+
+        body.dark-theme #results {
+            background-color: #444;
+            color: #eee;
+        }
+
+        body.light-theme {
+            background-color: #fff;
+            color: #333;
+        }
+
+        body.light-theme #settings {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        body.light-theme #results {
+            background-color: #f8f8f8;
+            color: #333;
+        }
+
+        body.sepia-theme {
+            background-color: #f5f5dc;
+            color: #704214;
+        }
+
+        body.sepia-theme #settings {
+            background-color: #e8e0d1;
+            color: #704214;
+        }
+
+        body.sepia-theme #results {
+            background-color: #e0d8c9;
+            color: #704214;
+        }
+
+        body.light-blue-theme {
+            background-color: #e1f5fe;
+            color: #01579b;
+        }
+
+        body.light-blue-theme #settings {
+            background-color: #b3e5fc;
+            color: #01579b;
+        }
+
+        body.light-blue-theme #results {
+            background-color: #e1f5fe;
+            color: #01579b;
+        }
+
+        body.dark-blue-theme {
+            background-color: #0d47a1;
+            color: #e3f2fd;
+        }
+
+        body.dark-blue-theme #settings {
+            background-color: #1565c0;
+            color: #e3f2fd;
+        }
+
+        body.dark-blue-theme #results {
+            background-color: #0d47a1;
+            color: #e3f2fd;
+        }
+
+        body.green-theme {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        body.green-theme #settings {
+            background-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        body.green-theme #results {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+        }
+    </style>
+</head>
+
+<body class="sepia-theme">
+    <div id="homePage">
+        <h1>AWS Exam Question Bank</h1>
+        <p>Welcome! Please select the number of questions you want to answer.</p>
+        <div>
+            <label for="numQuestions">Number of Questions:</label>
+            <input type="number" id="numQuestions" value="10" min="1">
+
+            <div>
+                <label for="timerMode">Timer Mode:</label>
+                <select id="timerMode">
+                    <option value="none" selected>No Timer</option>
+                    <option value="countdown">Countdown</option>
+                    <option value="stopwatch">Stopwatch</option>
+                </select>
+            </div>
+            <div id="countdownConfig" style="display:none;">
+                <label for="countdownMinutes">Countdown (minutes):</label>
+                <input type="number" id="countdownMinutes" value="65" min="1">
+            </div>
+
+        </div>
+        <button id="startQuizBtn">Start Quiz</button>
+    </div>
+
+    <div id="settings">
+        <div id="timerDisplay"></div>
+        <div>
+            Questions per page:
+            <select id="questionsPerPage">
+                <option value="1">1</option>
+                <option value="10" selected>10</option>
+                <option value="all">All</option>
+            </select>
+        </div>
+        <div>
+            Theme:
+            <select id="themeSelect">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="sepia" selected>Sepia</option>
+                <option value="light-blue">Light Blue</option>
+                <option value="dark-blue">Dark Blue</option>
+                <option value="green">Green</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="questionContainer">
+        <div id="question"></div>
+        <div id="answers"></div>
+        <div class="navigation">
+            <button id="prevBtn">Previous</button>
+            <button id="nextBtn">Next</button>
+            <button id="submitBtn">Submit</button>
+        </div>
+    </div>
+
+    <div id="results">
+        <div id="resultsHeader"></div>
+        <div id="resultsContent"></div>
+        <div id="resultsNavigation">
+            <button id="showAllBtn">Show All Results</button>
+            <button id="showMissedBtn">Show Only Missed</button>
+            <button id="backToHomeBtn">Back to Home</button>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script>
+        // DOM elements
+        const homePage = document.getElementById('homePage');
+        const settingsBar = document.getElementById('settings');
+        const questionContainer = document.getElementById('questionContainer');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const numQuestionsInput = document.getElementById('numQuestions');
+        const questionDiv = document.getElementById('question');
+        const answersDiv = document.getElementById('answers');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultsDiv = document.getElementById('results');
+        const resultsHeader = document.getElementById('resultsHeader');
+        const resultsContent = document.getElementById('resultsContent');
+        const showAllBtn = document.getElementById('showAllBtn');
+        const showMissedBtn = document.getElementById('showMissedBtn');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const questionsPerPageSelect = document.getElementById('questionsPerPage');
+        const themeSelect = document.getElementById('themeSelect');
+
+        // State variables
+        let quizQuestions = [];
+
+        let timerMode = "none";
+        let countdownTime = 0;
+        let elapsedSeconds = 0;
+        let timerInterval = null;
+
+        let userAnswers = {};
+        let currentQuestionIndex = 0;
+        let questionsPerPage = parseInt(questionsPerPageSelect.value);
+
+        // Apply theme to the body
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerMode = document.getElementById("timerMode").value;
+            if (timerMode === "countdown") {
+                countdownTime = parseInt(document.getElementById("countdownMinutes").value) * 60;
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    countdownTime--;
+                    updateTimerDisplay();
+                    if (countdownTime <= 0) {
+                        clearInterval(timerInterval);
+                        saveAnswers();
+                        showAllResults();
+                        resultsDiv.style.display = 'block';
+                        questionContainer.style.display = 'none';
+                        settingsBar.style.display = 'none';
+                        alert("Time is up! Your exam has been submitted automatically.");
+                    }
+                }, 1000);
+            } else if (timerMode === "stopwatch") {
+                elapsedSeconds = 0;
+                updateTimerDisplay();
+                timerInterval = setInterval(() => {
+                    elapsedSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function updateTimerDisplay() {
+            if (timerMode === "countdown") {
+                const minutes = Math.floor(countdownTime / 60);
+                const seconds = countdownTime % 60;
+                document.getElementById("timerDisplay").innerText = "Time Left: " + minutes + "m " + seconds + "s";
+            } else if (timerMode === "stopwatch") {
+                const minutes = Math.floor(elapsedSeconds / 60);
+                const seconds = elapsedSeconds % 60;
+                document.getElementById("timerDisplay").innerText = "Elapsed Time: " + minutes + "m " + seconds + "s";
+            } else {
+                document.getElementById("timerDisplay").innerText = "";
+            }
+        }
+
+
+        function applyTheme(theme) {
+            document.body.className = '';
+            document.body.classList.add(theme + '-theme');
+            localStorage.setItem('theme', theme);
+        }
+
+        // Shuffle and get a subset of questions
+        function getQuizQuestions(num) {
+            // Return the requested number of questions
+            return questions.slice(0, num);
+        }
+
+        // Display the current set of questions
+        function displayQuestions() {
+            const start = currentQuestionIndex;
+            let end = start + questionsPerPage;
+            if (questionsPerPageSelect.value === 'all') {
+                end = quizQuestions.length;
+            }
+
+            questionDiv.innerHTML = '';
+            answersDiv.innerHTML = '';
+
+            for (let i = start; i < end; i++) {
+                if (i < quizQuestions.length) {
+                    const q = quizQuestions[i];
+                    const questionItem = document.createElement('div');
+                    questionItem.classList.add('question');
+                    questionItem.innerHTML = `<p>${i + 1}. ${q.question}</p>`;
+                    answersDiv.appendChild(questionItem);
+
+                    const answersList = document.createElement('div');
+                    answersList.classList.add('answers-list');
+
+                    q.answers.forEach(answer => {
+                        const label = document.createElement('label');
+                        const input = document.createElement('input');
+
+                        input.type = Array.isArray(q.correctAnswer) ? 'checkbox' : 'radio';
+                        input.name = `question${i}`;
+                        input.value = answer;
+
+                        // Check for saved answers
+                        const savedAnswer = userAnswers[i];
+                        if (Array.isArray(savedAnswer)) {
+                            input.checked = savedAnswer.includes(answer);
+                        } else {
+                            input.checked = savedAnswer === answer;
+                        }
+
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(answer));
+                        answersList.appendChild(label);
+                    });
+                    answersDiv.appendChild(answersList);
+                }
+            }
+            updateNavigationButtons();
+        }
+
+        // Save user's answer
+        function saveAnswers() {
+            const start = currentQuestionIndex;
+            let end = start + questionsPerPage;
+            if (questionsPerPageSelect.value === 'all') {
+                end = quizQuestions.length;
+            }
+
+            for (let i = start; i < end; i++) {
+                const currentQuestion = quizQuestions[i];
+                if (Array.isArray(currentQuestion.correctAnswer)) {
+                    userAnswers[i] = Array.from(document.querySelectorAll(`input[name="question${i}"]:checked`)).map(input => input.value);
+                } else {
+                    const selectedInput = document.querySelector(`input[name="question${i}"]:checked`);
+                    userAnswers[i] = selectedInput ? selectedInput.value : null;
+                }
+            }
+        }
+
+        // Render results
+        function renderResults(questionsToDisplay) {
+            resultsContent.innerHTML = '';
+            questionsToDisplay.forEach((q, index) => {
+                const originalIndex = quizQuestions.indexOf(q); // Find the original index in quizQuestions array
+                const userAnswer = userAnswers[originalIndex];
+                const isCorrect = Array.isArray(q.correctAnswer) ?
+                    Array.isArray(userAnswer) && q.correctAnswer.every(a => userAnswer.includes(a)) && userAnswer.every(a => q.correctAnswer.includes(a)) :
+                    userAnswer === q.correctAnswer;
+
+                const resultItem = document.createElement('div');
+                resultItem.classList.add('result-item', isCorrect ? 'correct' : 'incorrect');
+
+                let resultHTML = `
+                    <p><b>Question ${originalIndex + 1}:</b> ${q.question}</p>
+                    <p><b>Your Answer:</b> <span class="user-answer-text">${Array.isArray(userAnswer) ? userAnswer.join(', ') : userAnswer || 'Not Answered'}</span></p>
+                    <p>Result: ${isCorrect ? 'Correct' : 'Incorrect'}</p>
+                    <div class="options-list">
+                        <p><b>Options:</b></p>
+                        <ul>
+                            ${q.answers.map(answer => `<li>${answer}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+
+                if (!isCorrect) {
+                    resultHTML += `
+                        <p><b>Correct Answer:</b> <span class="correct-answer-text">${Array.isArray(q.correctAnswer) ? q.correctAnswer.join(', ') : q.correctAnswer}</span></p>
+                        <p class="explanation"><b>Explanation:</b> ${q.explanation}</p>
+                    `;
+                    if (q.incorrectExplanations) {
+                        resultHTML += `
+                            <p style="font-weight: bold; margin-top: 10px;">Why other answers are incorrect:</p>
+                            <ul>
+                                ${q.incorrectExplanations.map(exp => `<li>${exp}</li>`).join('')}
+                            </ul>
+                        `;
+                    }
+                }
+
+                resultItem.innerHTML = resultHTML;
+                resultsContent.appendChild(resultItem);
+            });
+        }
+
+        // Show results for all questions
+        function showAllResults() {
+            let correctCount = 0;
+            quizQuestions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = Array.isArray(q.correctAnswer) ?
+                    Array.isArray(userAnswer) && q.correctAnswer.every(a => userAnswer.includes(a)) && userAnswer.every(a => q.correctAnswer.includes(a)) :
+                    userAnswer === q.correctAnswer;
+                if (isCorrect) {
+                    correctCount++;
+                }
+            });
+            let percentage = ((correctCount / quizQuestions.length) * 100).toFixed(2);
+            resultsHeader.innerHTML = `<h2>Your Score: ${correctCount} / ${quizQuestions.length} (${percentage}%)</h2>`;
+            renderResults(quizQuestions);
+        }
+
+        // Show only missed questions
+        function showMissedResults() {
+            const missedQuestions = quizQuestions.filter((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = Array.isArray(q.correctAnswer) ?
+                    Array.isArray(userAnswer) && q.correctAnswer.every(a => userAnswer.includes(a)) && userAnswer.every(a => q.correctAnswer.includes(a)) :
+                    userAnswer === q.correctAnswer;
+                return !isCorrect;
+            });
+            resultsHeader.innerHTML = `<h2>Missed Questions (${missedQuestions.length})</h2>`;
+            renderResults(missedQuestions);
+        }
+
+        // Update navigation button visibility
+        function updateNavigationButtons() {
+            const questionsPerPageValue = questionsPerPageSelect.value === 'all' ? quizQuestions.length : parseInt(questionsPerPageSelect.value);
+            const isLastPage = (currentQuestionIndex + questionsPerPageValue) >= quizQuestions.length;
+
+            prevBtn.style.visibility = currentQuestionIndex > 0 ? 'visible' : 'hidden';
+
+            if (isLastPage) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // Return to home page
+        function backToHome() {
+            resultsDiv.style.display = 'none';
+            questionContainer.style.display = 'none';
+            settingsBar.style.display = 'none';
+            homePage.style.display = 'flex';
+        }
+
+        // Event listeners
+        startQuizBtn.addEventListener('click', () => {
+            const numQuestions = parseInt(numQuestionsInput.value);
+            if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > questions.length) {
+                alert(`Please enter a number between 1 and ${questions.length}.`);
+                return;
+            }
+            quizQuestions = getQuizQuestions(numQuestions);
+            startTimer();
+            currentQuestionIndex = 0;
+            userAnswers = {};
+            homePage.style.display = 'none';
+            settingsBar.style.display = 'flex';
+            questionContainer.style.display = 'block';
+            resultsDiv.style.display = 'none';
+            questionsPerPage = parseInt(questionsPerPageSelect.value);
+            displayQuestions();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            saveAnswers();
+            let questionsPerPageValue = questionsPerPageSelect.value === 'all' ? quizQuestions.length : parseInt(questionsPerPageSelect.value);
+            currentQuestionIndex += questionsPerPageValue;
+            displayQuestions();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            saveAnswers();
+            let questionsPerPageValue = questionsPerPageSelect.value === 'all' ? quizQuestions.length : parseInt(questionsPerPageSelect.value);
+            currentQuestionIndex -= questionsPerPageValue;
+            displayQuestions();
+        });
+
+        submitBtn.addEventListener('click', () => {
+            saveAnswers();
+            showAllResults();
+            resultsDiv.style.display = 'block';
+            questionContainer.style.display = 'none';
+            settingsBar.style.display = 'none';
+        });
+
+        showAllBtn.addEventListener('click', showAllResults);
+        showMissedBtn.addEventListener('click', showMissedResults);
+        backToHomeBtn.addEventListener('click', backToHome);
+
+        questionsPerPageSelect.addEventListener('change', (e) => {
+            questionsPerPage = e.target.value === 'all' ? quizQuestions.length : parseInt(e.target.value);
+            currentQuestionIndex = 0;
+            displayQuestions();
+        });
+
+        themeSelect.addEventListener('change', (e) => {
+            applyTheme(e.target.value);
+        });
+
+    </script>
+</body>
+
+</html>
